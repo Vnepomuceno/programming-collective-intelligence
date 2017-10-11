@@ -10,8 +10,10 @@ def get_word_counts(url):
 
     # Loop over all the entries
     for e in d.entries:
-        if 'summary' in e: summary = e.summary
-        else: summary = e.description
+        if 'summary' in e:
+            summary = e.summary
+        else:
+            summary = e.description
 
         # Extract a list of words
         words = get_words(e.title + ' ' + summary)
@@ -33,35 +35,35 @@ def get_words(html):
     return [word.lower() for word in words if word != '']
 
 
-apcount = {}
+ap_count = {}
 word_counts = {}
 feed_list = [line for line in file('feedlist.txt')]
 for feed_url in feed_list:
     try:
-        (title, wc) = get_word_counts(feed_url)
+        title, wc = get_word_counts(feed_url)
         word_counts[title] = wc
-        for (word, count) in wc.items():
-            apcount.setdefault(word, 0)
+        for word, count in wc.items():
+            ap_count.setdefault(word, 0)
             if count > 1:
-                apcount[word] += 1
+                ap_count[word] += 1
+        print 'Successfully parsed feed %s' % feed_url
     except:
         print 'Failed to parse feed %s' % feed_url
 
-word_list = []
-for (w, bc) in apcount.items():
+wordlist = []
+for w, bc in ap_count.items():
     frac = float(bc) / len(feed_list)
     if 0.1 < frac < 0.5:
-        word_list.append(w)
+        wordlist.append(w)
 
 out = file('blogdata.txt', 'w')
 out.write('Blog')
-for word in word_list:
-    out.write('\t%s' % word)
+for word in wordlist: out.write('\t%s' % word)
 out.write('\n')
-for (blog, wc) in word_counts.items():
+for blog, wc in word_counts.items():
     print blog
     out.write(blog)
-    for word in word_list:
+    for word in wordlist:
         if word in wc:
             out.write('\t%d' % wc[word])
         else:
